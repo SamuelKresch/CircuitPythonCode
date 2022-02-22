@@ -1,0 +1,58 @@
+#===================================================================================
+# https://github.com/ccccmagicboy/MicroPython_fw_action
+# Description: Build MicroPython firmware using GitHub Actions for mpy-cross
+# Lisence: MIT
+# Author: ccccmagicboy
+# Url: https://ccrobot-online.com
+#===================================================================================
+
+name: CircuitPython mpy-cross Build
+
+on:
+  push:
+    paths:
+    - 'lib_original/*.py'
+  # watch:
+    # types: [started]
+    
+# ┌───────────── minute (0 - 59)
+# │ ┌───────────── hour (0 - 23)
+# │ │ ┌───────────── day of the month (1 - 31)
+# │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+# │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+# │ │ │ │ │                                   
+# │ │ │ │ │
+# │ │ │ │ │
+# * * * * *  
+
+env:
+  REPO_URL: https://github.com/adafruit/circuitpython.git
+  REPO_BRANCH: master
+  TZ: America/Los_Angeles
+
+jobs:
+  build:
+    name: Build Linux
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: Checkout this repos
+      uses: actions/checkout@v2    
+  
+    - name: Get the python3
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+        architecture: 'x64'      
+
+    - name: Clone the micropython source code
+      run: |
+        git clone --depth 1 $REPO_URL 
+        git submodule update --init
+        
+    - name: Build the mpy-cross tool
+      working-directory: ./circuitpython/mpy-cross
+      run: |
+        make
+
+        
